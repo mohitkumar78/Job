@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 
-const companyShema = mongoose.Schema({
-
+const companySchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
@@ -24,7 +23,6 @@ const companyShema = mongoose.Schema({
         ref: "User",
         required: true
     }
+});
+export const Company = mongoose.model("Company", companySchema);
 
-})
-
-export const Company = mongoose.model("Company", companyShema);
