@@ -54,4 +54,5 @@ const jobShema = mongoose.Schema({
 
 })
 
-export const job = mongoose.model("job", jobShema);
+const job = mongoose.model("job", jobShema);
+export default job;

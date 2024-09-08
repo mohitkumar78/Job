@@ -1,17 +1,21 @@
-import { job, job } from "../Models/job.model";
+
+
+import job from "../Models/job.model.js";
 
 export const CreateJob = async (req, res) => {
-
     try {
-        const { title, description, requirements, sallary, location, jobType, expriance, opening, CompanyId } = req.body
-        const userId = req.id
+        const { title, description, requirements, sallary, location, jobType, expriance, opening, CompanyId } = req.body;
+        const userId = req.id;
+
         if (!title || !description || !requirements || !sallary || !location || !opening || !CompanyId || !expriance) {
             return res.status(400).json({
-                message: "Somthing is Missing",
-                sucess: false
-            })
+                message: "Something is Missing",
+                success: false
+            });
         }
-        const job = job.create({
+
+        // Rename the local variable to something else (e.g., newJob)
+        const newJob = await job.create({
             title,
             description,
             requirements: requirements.split(","),
@@ -22,65 +26,63 @@ export const CreateJob = async (req, res) => {
             expriance,
             company: CompanyId,
             createdBy: userId
-        })
+        });
 
         return res.status(200).json({
-            job,
-            message: "job created sucessfully",
-            sucess: true
-        })
-
+            newJob,  // Use newJob instead of job here
+            message: "Job created successfully",
+            success: true
+        });
 
     } catch (error) {
-        console.log("error occur in job creation", error)
+        console.log("Error occurred in job creation:", error);
         return res.status(400).json({
-            message: "internal server error",
-            sucess: false
-        })
+            message: "Internal server error",
+            success: false
+        });
     }
-
-}
+};
 
 export const getAllJob = async (req, res) => {
-
     try {
-        const keyword = req.params.keyword;
-        const querry = {
+        const keyword = req.params.keyword || "";
+        const query = {
             $or: [
-
-                { "title": { $regax: keyword, Option: "i" } },
-                { "description": { $regax: keyword, Option: "i" } }
-
+                { "title": { $regex: keyword, $options: "i" } },  // Case-insensitive search for title
+                { "description": { $regex: keyword, $options: "i" } }  // Case-insensitive search for description
             ]
+        };
+
+        const jobs = await job.find(query).populate('company');  // Assuming you want to populate the company field
+        if (!jobs.length) {
+            return res.status(404).json({
+                message: "No jobs found",
+                success: false
+            });
         }
 
-        const jobs = job.find(querry).populate('ti');
-        if (!jobs) {
-            return res.status(404).json({
-                message: "job are not found",
-                sucess: false
-            })
-        }
         return res.status(200).json({
             jobs,
-            sucess: true
-        })
+            success: true
+        });
     } catch (error) {
-        console.log("error in get all job")
-        return res.status(404).json({
-            message: "inetrnal server error",
-            sucess: false
-        })
+        console.log("Error in get all job:", error);
+        return res.status(500).json({
+            message: "Internal server error",
+            success: false
+        });
     }
-}
+};
+
 
 export const getJobById = async (req, res) => {
 
     try {
         const jobid = req.params.id
-        const job = await job.findById(jobid);
+        console.log(jobid)
+        const job2 = await job.findById(jobid);
 
-        if (!job) {
+        if (!job2) {
             return res.status(404).json(
                 {
                     message: "job is not found",
@@ -90,7 +92,7 @@ export const getJobById = async (req, res) => {
         }
 
         return res.status(200).json({
-            job,
+            job2,
             sucess: true
 
         })
